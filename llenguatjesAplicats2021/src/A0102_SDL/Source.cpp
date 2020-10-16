@@ -1,13 +1,14 @@
-#include <SDL.h> // Always needs to be included for an SDL app
+//SDL includes
+#include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
+#include <SDL_mixer.h>
 
 #include <exception>
 #include <iostream>
 #include <string>
 
-//Game general information
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+#include "Types.h"
 
 int main(int, char* [])
 {
@@ -34,10 +35,11 @@ int main(int, char* [])
 		throw "Error: SDL_image init";
 
 	//-->SDL_TTF
-
+	if (TTF_Init() == -1) throw "No es pot inicialitzar SDL_ttf";
 
 	//-->SDL_Mix
-
+	const Uint8 mixFlags{ MIX_INIT_MP3 };
+	if (!(Mix_Init(mixFlags) & mixFlags)) throw "Error amb SDL_Mixer init";
 
 	// --- SPRITES ---
 	//Background
@@ -47,7 +49,9 @@ int main(int, char* [])
 	SDL_Rect bgRect{ 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
 	//Mouse
-
+	SDL_Texture* cursorTexture{ IMG_LoadTexture(m_renderer, "../../res/img/kintoun.png") };
+	if (cursorTexture == nullptr) throw "Error: cursorTexture init";
+	SDL_Rect playerRect{ 0, 0, 100, 70 };
 
 	//-->Animated Sprite ---
 
@@ -72,26 +76,42 @@ int main(int, char* [])
 				if (event.key.keysym.sym == SDLK_ESCAPE)
 					isRunning = false;
 				break;
+			case SDL_MOUSEMOTION:
+				mouse.x = event.motion.x;
+				mouse.y = event.motion.y;
+				break;
 			default:;
 			}
 		}
 
 		// UPDATE
 
+		playerRect.x += (mouse.x - playerRect.x - playerRect.w / 2) / 10;
+		playerRect.y += (mouse.y - playerRect.y - playerRect.h / 2) / 10;
+
 		// DRAW
+
 		SDL_RenderClear(m_renderer);
+
 		//Background
 		SDL_RenderCopy(m_renderer, bgTexture, nullptr, &bgRect);
+
+		//Mouse
+		SDL_RenderCopy(m_renderer, cursorTexture, nullptr, &playerRect);
 		SDL_RenderPresent(m_renderer);
 	}
 
 	// --- DESTROY ---
 	SDL_DestroyTexture(bgTexture);
-	IMG_Quit();
+	SDL_DestroyTexture(cursorTexture);
 	SDL_DestroyRenderer(m_renderer);
 	SDL_DestroyWindow(m_window);
 
 	// --- QUIT ---
+	IMG_Quit();
+	Mix_CloseAudio();
+	Mix_Quit();
+	TTF_Quit();
 	SDL_Quit();
 
 	return 0;

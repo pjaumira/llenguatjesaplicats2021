@@ -1,4 +1,7 @@
 #pragma once
+
+//Document per recopilar variables importants i que no molestin al document principal
+
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 

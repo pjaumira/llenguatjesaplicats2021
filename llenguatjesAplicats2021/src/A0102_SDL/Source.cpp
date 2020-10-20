@@ -4,10 +4,12 @@
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
 
+//Generic includes
 #include <exception>
 #include <iostream>
 #include <string>
 
+//Include de extra variables
 #include "Types.h"
 
 int main(int, char* [])
@@ -44,14 +46,13 @@ int main(int, char* [])
 	// --- SPRITES ---
 	//Background
 	SDL_Texture* bgTexture{ IMG_LoadTexture(m_renderer, "../../res/img/bg.jpg") };
-	if (bgTexture == nullptr)
-		throw "Error: bgTexture init";
+	if (bgTexture == nullptr) throw "Error: bgTexture init";
 	SDL_Rect bgRect{ 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
 	//Mouse
 	SDL_Texture* cursorTexture{ IMG_LoadTexture(m_renderer, "../../res/img/kintoun.png") };
 	if (cursorTexture == nullptr) throw "Error: cursorTexture init";
-	SDL_Rect playerRect{ 0, 0, 100, 70 };
+	SDL_Rect playerRect{ 0, 0, 100, 50 };
 
 	//-->Animated Sprite ---
 
@@ -76,6 +77,7 @@ int main(int, char* [])
 				if (event.key.keysym.sym == SDLK_ESCAPE)
 					isRunning = false;
 				break;
+			// Capturar el moviment del ratoli al Vector mouse
 			case SDL_MOUSEMOTION:
 				mouse.x = event.motion.x;
 				mouse.y = event.motion.y;
@@ -86,11 +88,12 @@ int main(int, char* [])
 
 		// UPDATE
 
+		// Suavitzem el moviment del ratoli perque el segueixi
 		playerRect.x += (mouse.x - playerRect.x - playerRect.w / 2) / 10;
 		playerRect.y += (mouse.y - playerRect.y - playerRect.h / 2) / 10;
 
 		// DRAW
-
+		//Neteja tot el renderer
 		SDL_RenderClear(m_renderer);
 
 		//Background
@@ -98,6 +101,7 @@ int main(int, char* [])
 
 		//Mouse
 		SDL_RenderCopy(m_renderer, cursorTexture, nullptr, &playerRect);
+
 		SDL_RenderPresent(m_renderer);
 	}
 
